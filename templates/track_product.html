@@ -1,0 +1,199 @@
+{% extends "base.html" %} {% block title %}Home - Amazon Price Tracker{%
+endblock %} {% block content %}
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <!-- Hero Section -->
+    <div class="text-center mb-5">
+      <h1 class="display-4 fw-bold text-primary mb-3">
+        <i class="bi bi-graph-up-arrow me-3"></i>Amazon Price Tracker
+      </h1>
+      <p class="lead text-muted">
+        Track Amazon product prices and never miss a deal again. Get historical
+        price data and trends for any Amazon product.
+      </p>
+    </div>
+
+    <!-- Add Product Form -->
+    <div class="card shadow-sm mb-5">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+          <i class="bi bi-plus-circle me-2"></i>Add Product to Track
+        </h5>
+      </div>
+      <div class="card-body">
+        <form
+          action="{{ url_for('add_product') }}"
+          method="POST"
+          id="addProductForm"
+        >
+          <div class="mb-3">
+            <label for="url" class="form-label fw-semibold"
+              >Amazon Product URL</label
+            >
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="bi bi-link-45deg"></i>
+              </span>
+              <input
+                type="url"
+                class="form-control"
+                id="url"
+                name="url"
+                placeholder="https://www.amazon.com/dp/XXXXXXXXXX"
+                required
+              />
+              <button class="btn btn-primary" type="submit" id="submitBtn">
+                <i class="bi bi-plus-lg me-1"></i>Track Product
+              </button>
+            </div>
+            <div class="form-text">
+              <i class="bi bi-info-circle me-1"></i>
+              Paste any Amazon product URL to start tracking its price
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- How it Works -->
+    <div class="row mb-5">
+      <div class="col-12">
+        <h3 class="text-center mb-4">How It Works</h3>
+      </div>
+      <div class="col-md-4">
+        <div class="text-center">
+          <div
+            class="bg-primary text-white rounded-circle p-3 d-inline-flex mb-3"
+            style="width: 60px; height: 60px"
+          >
+            <i class="bi bi-link-45deg fs-4 m-auto"></i>
+          </div>
+          <h5>1. Add URL</h5>
+          <p class="text-muted">
+            Paste any Amazon product URL to start tracking
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-center">
+          <div
+            class="bg-success text-white rounded-circle p-3 d-inline-flex mb-3"
+            style="width: 60px; height: 60px"
+          >
+            <i class="bi bi-graph-up fs-4 m-auto"></i>
+          </div>
+          <h5>2. Track Prices</h5>
+          <p class="text-muted">
+            We monitor price changes and build historical data
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="text-center">
+          <div
+            class="bg-info text-white rounded-circle p-3 d-inline-flex mb-3"
+            style="width: 60px; height: 60px"
+          >
+            <i class="bi bi-bell fs-4 m-auto"></i>
+          </div>
+          <h5>3. Get Insights</h5>
+          <p class="text-muted">
+            View charts and trends to make informed decisions
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Products -->
+    {% if recent_products %}
+    <div class="card shadow-sm">
+      <div class="card-header bg-light">
+        <h5 class="mb-0">
+          <i class="bi bi-clock-history me-2"></i>Recently Added Products
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          {% for product in recent_products %}
+          <div class="col-lg-6 mb-3">
+            <div class="border rounded p-3 h-100">
+              <h6 class="text-truncate mb-2">
+                <a
+                  href="{{ url_for('track_product', product_id=product.id) }}"
+                  class="text-decoration-none"
+                >
+                  {{ product.short_title }}
+                </a>
+              </h6>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="h5 text-success mb-0"
+                  >${{ "%.2f"|format(product.current_price) }}</span
+                >
+                <small class="text-muted">
+                  {% if product.price_trend == 'up' %}
+                  <i class="bi bi-arrow-up text-danger"></i>
+                  {% elif product.price_trend == 'down' %}
+                  <i class="bi bi-arrow-down text-success"></i>
+                  {% else %}
+                  <i class="bi bi-dash text-muted"></i>
+                  {% endif %} {{ product.created_at.strftime('%m/%d') }}
+                </small>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="text-center mt-3">
+          <a
+            href="{{ url_for('all_products') }}"
+            class="btn btn-outline-primary"
+          >
+            <i class="bi bi-list-ul me-1"></i>View All Products
+          </a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="card shadow-sm">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted mb-3"></i>
+        <h5>No products tracked yet</h5>
+        <p class="text-muted">
+          Add your first Amazon product URL above to get started!
+        </p>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("addProductForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const urlInput = document.getElementById("url");
+
+    form.addEventListener("submit", function (e) {
+      const url = urlInput.value.trim();
+
+      // Basic Amazon URL validation
+      if (!url.includes("amazon.")) {
+        e.preventDefault();
+        alert("Please enter a valid Amazon product URL");
+        return;
+      }
+
+      // Show loading state
+      submitBtn.disabled = true;
+      submitBtn.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-1"></span>Adding...';
+    });
+
+    // Reset button state if user navigates back
+    urlInput.addEventListener("input", function () {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="bi bi-plus-lg me-1"></i>Track Product';
+    });
+  });
+</script>
+{% endblock %}

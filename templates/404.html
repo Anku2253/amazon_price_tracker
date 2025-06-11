@@ -1,0 +1,235 @@
+{% extends "base.html" %} {% block title %}Page Not Found - Amazon Price
+Tracker{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="error-page text-center">
+        <!-- Error Icon -->
+        <div class="error-icon mb-4">
+          <svg
+            width="120"
+            height="120"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            class="text-warning"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="m9 9 6 6"></path>
+            <path d="M9 15 15 9"></path>
+          </svg>
+        </div>
+
+        <!-- Error Code -->
+        <h1 class="error-code display-1 fw-bold text-primary mb-3">404</h1>
+
+        <!-- Error Title -->
+        <h2 class="error-title h3 text-secondary mb-4">Oops! Page Not Found</h2>
+
+        <!-- Error Message -->
+        <div class="error-message mb-5">
+          <p class="lead text-muted mb-3">
+            The page you're looking for seems to have wandered off into the
+            digital void. It might have been moved, deleted, or perhaps it never
+            existed at all.
+          </p>
+          <p class="text-muted">
+            Don't worry though - we can help you find what you're looking for!
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="error-actions">
+          <div class="row g-3 justify-content-center">
+            <div class="col-auto">
+              <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  class="me-2"
+                >
+                  <path
+                    d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+                  ></path>
+                  <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                </svg>
+                Go Home
+              </a>
+            </div>
+            <div class="col-auto">
+              <a
+                href="{{ url_for('index') }}"
+                class="btn btn-outline-primary btn-lg"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  class="me-2"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                Track Products
+              </a>
+            </div>
+            <div class="col-auto">
+              <button onclick="history.back()" class="btn btn-secondary btn-lg">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  class="me-2"
+                >
+                  <path d="m12 19-7-7 7-7"></path>
+                  <path d="M19 12H5"></path>
+                </svg>
+                Go Back
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Helpful Links -->
+        <div class="helpful-links mt-5 pt-4 border-top">
+          <h5 class="text-secondary mb-3">Maybe you were looking for:</h5>
+          <div class="row g-3 justify-content-center">
+            <div class="col-auto">
+              <a
+                href="{{ url_for('all_products') }}"
+                class="text-decoration-none"
+              >
+                <div class="card h-100 shadow-sm">
+                  <div class="card-body text-center p-3">
+                    <svg
+                      width="32"
+                      height="32"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      class="text-primary mb-2"
+                    >
+                      <path d="M3 3h18v18H3zM9 9h6v6H9z"></path>
+                    </svg>
+                    <h6 class="card-title mb-1">All Products</h6>
+                    <small class="text-muted">View tracked items</small>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="col-auto">
+              <a href="{{ url_for('index') }}" class="text-decoration-none">
+                <div class="card h-100 shadow-sm">
+                  <div class="card-body text-center p-3">
+                    <svg
+                      width="32"
+                      height="32"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      class="text-success mb-2"
+                    >
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path
+                        d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"
+                      ></path>
+                    </svg>
+                    <h6 class="card-title mb-1">Add Product</h6>
+                    <small class="text-muted">Start tracking prices</small>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Suggestion -->
+        <div class="search-suggestion mt-4 p-4 bg-light rounded">
+          <h6 class="text-secondary mb-3">Still can't find what you need?</h6>
+          <p class="text-muted mb-0">
+            Try checking the URL for typos, or use the navigation menu above to
+            explore our features. If you believe this is an error, please
+            contact support.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .error-page {
+    padding: 3rem 0;
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .error-icon svg {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  }
+
+  .error-code {
+    font-size: 8rem;
+    font-weight: 900;
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-dark)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .helpful-links .card {
+    transition: all 0.3s ease;
+    border: none;
+    width: 120px;
+  }
+
+  .helpful-links .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .search-suggestion {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
+    border: 1px solid #dee2e6;
+  }
+
+  @media (max-width: 768px) {
+    .error-code {
+      font-size: 6rem;
+    }
+
+    .error-actions .btn {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+
+    .helpful-links .col-auto {
+      flex: 1;
+    }
+
+    .helpful-links .card {
+      width: 100%;
+    }
+  }
+</style>
+{% endblock %}

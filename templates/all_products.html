@@ -1,0 +1,292 @@
+{% extends "base.html" %} {% block title %}All Products - Amazon Price Tracker{%
+endblock %} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2><i class="bi bi-list-ul me-2"></i>All Tracked Products</h2>
+        <p class="text-muted mb-0">
+          {{ products|length }} product{{ 's' if products|length != 1 else '' }}
+          currently being tracked
+        </p>
+      </div>
+      <a href="{{ url_for('index') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Product
+      </a>
+    </div>
+
+    {% if products %}
+    <!-- Products Grid -->
+    <div class="row">
+      {% for product in products %}
+      <div class="col-lg-6 col-xl-4 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body d-flex flex-column">
+            <!-- Product Title -->
+            <h6 class="card-title mb-3">
+              <a
+                href="{{ url_for('track_product', product_id=product.id) }}"
+                class="text-decoration-none text-dark"
+              >
+                {{ product.short_title }}
+              </a>
+            </h6>
+
+            <!-- Price Info -->
+            <div class="mb-3">
+              <div
+                class="d-flex justify-content-between align-items-center mb-2"
+              >
+                <span class="text-muted small">Current Price</span>
+                <span class="h5 text-success mb-0"
+                  >${{ "%.2f"|format(product.current_price) }}</span
+                >
+              </div>
+
+              {% if product.lowest_price != product.current_price or
+              product.highest_price != product.current_price %}
+              <div class="d-flex justify-content-between text-muted small">
+                <span>
+                  <i class="bi bi-arrow-down text-success"></i>
+                  Low: ${{ "%.2f"|format(product.lowest_price) }}
+                </span>
+                <span>
+                  <i class="bi bi-arrow-up text-danger"></i>
+                  High: ${{ "%.2f"|format(product.highest_price) }}
+                </span>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Price Trend Badge -->
+            <div class="mb-3">
+              {% if product.price_trend == 'up' %}
+              <span class="badge bg-danger">
+                <i class="bi bi-trending-up me-1"></i>Rising
+              </span>
+              {% elif product.price_trend == 'down' %}
+              <span class="badge bg-success">
+                <i class="bi bi-trending-down me-1"></i>Falling
+              </span>
+              {% else %}
+              <span class="badge bg-secondary">
+                <i class="bi bi-dash me-1"></i>Stable
+              </span>
+              {% endif %}
+
+              <span class="badge bg-light text-dark ms-2">
+                {{ product.price_history|length }} update{{ 's' if
+                product.price_history|length != 1 else '' }}
+              </span>
+            </div>
+
+            <!-- Product Meta -->
+            <div class="text-muted small mb-3">
+              <div class="mb-1">
+                <i class="bi bi-calendar3 me-1"></i>
+                Added {{ product.created_at.strftime('%b %d, %Y') }}
+              </div>
+              <div class="mb-1">
+                <i class="bi bi-arrow-clockwise me-1"></i>
+                Updated {{ product.updated_at.strftime('%b %d, %Y') }}
+              </div>
+              <div>
+                <i class="bi bi-link-45deg me-1"></i>
+                <a
+                  href="{{ product.url }}"
+                  target="_blank"
+                  class="text-muted text-decoration-none"
+                >
+                  {{ product.domain }}
+                  <i class="bi bi-box-arrow-up-right ms-1"></i>
+                </a>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-auto">
+              <div class="btn-group w-100" role="group">
+                <a
+                  href="{{ url_for('track_product', product_id=product.id) }}"
+                  class="btn btn-outline-primary btn-sm"
+                >
+                  <i class="bi bi-graph-up me-1"></i>View
+                </a>
+                <a
+                  href="{{ url_for('update_price', product_id=product.id) }}"
+                  class="btn btn-outline-success btn-sm"
+                >
+                  <i class="bi bi-arrow-clockwise me-1"></i>Update
+                </a>
+                <a
+                  href="{{ url_for('delete_product', product_id=product.id) }}"
+                  class="btn btn-outline-danger btn-sm"
+                  onclick="return confirm('Are you sure you want to delete this product?')"
+                >
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="card mt-4">
+      <div class="card-body">
+        <h6 class="card-title">Bulk Actions</h6>
+        <div class="d-flex gap-2 flex-wrap">
+          <button
+            class="btn btn-outline-primary btn-sm"
+            onclick="updateAllPrices()"
+          >
+            <i class="bi bi-arrow-clockwise me-1"></i>Update All Prices
+          </button>
+          <button
+            class="btn btn-outline-secondary btn-sm"
+            onclick="exportData()"
+          >
+            <i class="bi bi-download me-1"></i>Export Data
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="card shadow-sm">
+      <div class="card-body text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted mb-4"></i>
+        <h4>No products tracked yet</h4>
+        <p class="text-muted mb-4">
+          Start tracking Amazon product prices by adding your first product URL.
+        </p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+          <i class="bi bi-plus-lg me-2"></i>Add Your First Product
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  function updateAllPrices() {
+    if (!confirm("This will update prices for all products. Continue?")) {
+      return;
+    }
+
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML =
+      '<span class="spinner-border spinner-border-sm me-1"></span>Updating...';
+
+    // Get all product IDs
+    const productCards = document.querySelectorAll('[href*="/product/"]');
+    const productIds = Array.from(productCards)
+      .map((link) => link.href.match(/\/product\/(\d+)/))
+      .filter((match) => match)
+      .map((match) => match[1]);
+
+    let completed = 0;
+    const total = productIds.length;
+
+    // Update each product sequentially to avoid overwhelming the server
+    async function updateNext(index) {
+      if (index >= productIds.length) {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        location.reload();
+        return;
+      }
+
+      const productId = productIds[index];
+
+      try {
+        await fetch(`/update_price/${productId}`);
+        completed++;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span>Updating... (${completed}/${total})`;
+      } catch (error) {
+        console.error(`Error updating product ${productId}:`, error);
+      }
+
+      // Small delay between requests
+      setTimeout(() => updateNext(index + 1), 1000);
+    }
+
+    updateNext(0);
+  }
+
+  function exportData() {
+    // Simple CSV export functionality
+    const products = [];
+    const cards = document.querySelectorAll(".card .card-body");
+
+    cards.forEach((card) => {
+      const titleLink = card.querySelector("h6 a");
+      const priceElement = card.querySelector(".h5.text-success");
+
+      if (titleLink && priceElement) {
+        const title = titleLink.textContent.trim();
+        const price = priceElement.textContent.replace("$", "");
+        const url = titleLink.href;
+
+        products.push({
+          title: title,
+          price: price,
+          url: url,
+          date: new Date().toISOString(),
+        });
+      }
+    });
+
+    if (products.length === 0) {
+      alert("No products to export");
+      return;
+    }
+
+    // Create CSV content
+    const headers = ["Title", "Current Price", "URL", "Export Date"];
+    const csvContent = [
+      headers.join(","),
+      ...products.map((p) =>
+        [
+          `"${p.title.replace(/"/g, '""')}"`,
+          p.price,
+          `"${p.url}"`,
+          p.date,
+        ].join(",")
+      ),
+    ].join("\n");
+
+    // Download CSV
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `amazon-price-tracker-${
+      new Date().toISOString().split("T")[0]
+    }.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
+  // Auto-refresh page every 5 minutes if user is actively viewing
+  let lastActivity = Date.now();
+  document.addEventListener("mousemove", () => (lastActivity = Date.now()));
+  document.addEventListener("keypress", () => (lastActivity = Date.now()));
+
+  setInterval(() => {
+    // Only refresh if user was active in the last 2 minutes
+    if (Date.now() - lastActivity < 2 * 60 * 1000) {
+      location.reload();
+    }
+  }, 5 * 60 * 1000);
+</script>
+{% endblock %}
